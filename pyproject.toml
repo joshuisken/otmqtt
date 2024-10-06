@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "otmqtt"
+version = "0.5.0"
+authors = [
+  { name="Jos Huisken", email="jos.huisken@gmail.com" },
+]
+description = "OpenTherm monitoring with MQTT."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/joshuisken/otmqtt"
+Issues = "https://github.com/joshuisken/otmqtt/issues"
