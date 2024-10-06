@@ -1,6 +1,4 @@
 # Add your pinned requirements so that they can be easily installed with:
 # pip install -r requirements.txt
-# Remember to also add them in setup.cfg but unpinned.
 aiomqtt>=2.3.0
-# paho-mqtt==2.1.0
 typing_extensions>=4.12.2
