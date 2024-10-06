@@ -188,14 +188,17 @@ async def process_discovery(client, message):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
+        prog="otmqtt",
         description="Send messages to Telegram bot Booy12 about OpenTherm.")
     parser.add_argument("-C", "--config", metavar="mqtt_ot.ini",
                         default="mqtt_ot.ini",
-                        help="Ini file with MQTT settings (def. generated if non-existing)")
+                        help=".ini file with MQTT settings (def. generated if non-existing)")
     parser.add_argument("-I", "--informative", action='store_true',
-                        help="Publish informative MQTT topics.")
+                        help="publish informative MQTT topics.")
+    parser.add_argument("-V", "--version", action='version',
+                        version='%(prog)s {version}'.format(version=__version__))
     parser.add_argument("-v", "--verbose", action='count', default=0,
-                        help="Verbose.")
+                        help="verbose [multiple -v increase verbosity].")
     return parser.parse_args()
 
 
@@ -281,6 +284,8 @@ async def mqtt_client(config):
                 will=will) as client:
             logger.info("Connected mqtt")
             await client.publish(f"{t_ot}/state", payload=f"online, trial {maxtrials - trials + 1}", retain=True)
+            # Clear the transfer cache in the OpenTherm gateway monitor
+            await client.publish(f"{t_esp}/cmd", payload="clear")
             for k in tasks.keys():
                 await client.subscribe(k)
             async for message in client.messages:

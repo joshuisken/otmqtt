@@ -22,11 +22,11 @@ OT = {
         'hflags': ["CH_enable", "DHW_enable", "Cooling_enable", "OTC_active",
                    "CH2_enable", "reserved", "reserved", "reserved"],
         'hflags_device_class': ["heat", None, None, None, None, None, None, None],
-        'hflags_enabled': [1, 0, 0, 0, 0, 0, 0, 0],
+        'hflags_enabled': [1, 1, 1, 1, 1, 0, 0, 0],
         'lflags': ["Fault", "CH_mode", "DHW_mode", "Flame_status",
                    "Cooling_status", "CH2_mode", "diagnostic", "reserved"],
         'lflags_device_class': [None, None, None, "heat", None, None, None, None],
-        'lflags_enabled': [0, 0, 0, 1, 0, 0, 0, 0]
+        'lflags_enabled': [1, 1, 1, 1, 1, 1, 1, 0]
     },
     1: {
         'DataObject': 'TSet',
