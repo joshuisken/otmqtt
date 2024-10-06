@@ -24,7 +24,8 @@ Have the ESP OpenTherm gateway hardware installed running the
 The program `otmqtt` needs a `otmqtt.ini` file with configuration settings and secrets.
 An example is generated on the first invocation:
 
-```$ otmqtt
+```
+$ otmqtt
 Writing default config to 'mqtt_ot.ini'
 Not connected to MQTT broker, did you fill-in credentials in 'mqtt_ot.ini'?
 ```
