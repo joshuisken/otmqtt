@@ -4,7 +4,7 @@ This package translates the OpenTherm data transfers, as monitored by
 the ESP OpenTherm MQTT gateway, into understandable MQTT topics and
 messages. 
 
-It provides auto-discovery by home-assistant.
+It provides auto-discovery of many (binary-)sensors for home-assistant.
 
 ## Requirements
 

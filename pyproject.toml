@@ -16,6 +16,13 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "aiomqtt",
+    "typing_extensions"
+]
+
+[project.scripts]
+otmqtt = "otmqtt.otmqtt:main"
 
 [project.urls]
 Homepage = "https://github.com/joshuisken/otmqtt"
