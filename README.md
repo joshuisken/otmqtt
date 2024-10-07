@@ -29,3 +29,24 @@ $ otmqtt
 Writing default config to 'mqtt_ot.ini'
 Not connected to MQTT broker, did you fill-in credentials in 'mqtt_ot.ini'?
 ```
+
+After connecting to the MQTT-broker `otmqtt` interprets the results of the 
+[OpenTherm MQTT gateway software](https://github.com/joshuisken/ot_mqtt_esp) 
+
+![image](docs/esp_mqtt_ot.png)
+
+into something more comprehensible 
+
+![image](docs/otmqtt.png)
+
+Registers which appear and are not specified in the V2.2 OpenTherm
+spec are reported.
+
+
+Additionally, it provides auto-discovery messages of all observed
+V2.2 OpenTherm Registers for [Home
+Assistant](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery)
+under topics
+`homeassistant/sensor/OpenThermGW/#/config` and
+`homeassistant/binary_sensor/OpenThermGW/#/config` using `#` as the
+wildcard for the sensor names. 
