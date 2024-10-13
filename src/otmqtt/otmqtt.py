@@ -39,7 +39,7 @@ online = False
 
 msgs_master = {}
 msgs_slave = {}
-
+t_esp = None
 
 logger = None
 
@@ -177,12 +177,19 @@ async def process_dump_state(client, message):
 
 
 async def process_discovery(client, message):
-    global logger
+    global logger, msgs_master, msgs_slave
     m = message.payload.decode('utf-8')
     logger.info(f"Homeassistant autodiscovery {m}")
     if m != "online":
         return
     # (Re-)Send all discovery messages for all available OpenTherm registers
+    # Clearing the cache in otmqtt
+    msgs_master = {}
+    msgs_slave = {}
+    # AND clear the cache in ot_mqtt_esp
+    global t_esp
+    t, p = f"{t_esp}/cmd", "clear"
+    await client.publish(t, payload=p)
     return
 
 
@@ -245,6 +252,7 @@ async def mqtt_client(config):
 
     # MQTT topic prefixes
     t_ot = config["topic"]
+    global t_esp
     t_esp = config["OTGW_topic"]
     t_hass = config["hass_discovery_prefix"]
 
@@ -323,6 +331,12 @@ def main():
     except aiomqtt.exceptions.MqttError as e:
         print(f"Not connected to MQTT broker, did you fill-in credentials in '{args.config}'?")
         return 1
+    except asyncio.exceptions.CancelledError as e:
+        print(f"{e}\nCancelled by what? KeyboardInterrupt?")
+        return 2
+    except KeyboardInterrupt as e:
+        print(e)
+        return 2
     logger.info("Finished")
     return 0
 
