@@ -36,7 +36,7 @@ OT = {
         'SubClass': 'OT_f88_C'
     },
     2: {
-        'DataObject': ['M-Config', 'M-MemberIDcode'],
+        'DataObject': ['M_Config', 'M_MemberIDcode'],
         'DataType': 'flag8 / u8',
         'Description': ['Master Configuration Flags', 'Master MemberID Code'],
         'R/W': '- W',
@@ -46,13 +46,13 @@ OT = {
         'hflags_enabled': [0] * 8
     },
     3: {
-        'DataObject': ['S-Config', 'S-MemberIDcode'],
+        'DataObject': ['S_Config', 'S_MemberIDcode'],
         'DataType': 'flag8 / u8',
         'Description': ['Slave Configuration Flags', 'Slave MemberID Code'],
         'R/W': 'R -',
         'SubClass': 'OT_f8u8',
         'hflags': ['DHW_present', 'Control_type', 'Cooling_config', 'DHW_config',
-                   'Master_low-off_and_pump_control', 'CH2_present', 'reserved', 'reserved'],
+                   'Master_low__off_and_pump_control', 'CH2_present', 'reserved', 'reserved'],
         'hflags_device_class': [None] * 8,
         'hflags_enabled': [1, 1, 1, 1, 1, 1, 0, 0]
     },
@@ -64,7 +64,7 @@ OT = {
         'SubClass': 'OT_u8u8'
     },
     5: {
-        'DataObject': ['ASF-flags', 'OEM-fault-code'],
+        'DataObject': ['ASF_flags', 'OEM_fault_code'],
         'DataType': 'flag8 / u8',
         'Description': ['Application-specific fault flags', 'OEM fault code'],
         'R/W': 'R -',
@@ -75,7 +75,7 @@ OT = {
         'hflags_enabled': [1, 1, 1, 1, 1, 1, 0, 0]
     },
     6: {
-        'DataObject': 'RBP-flags',
+        'DataObject': 'RBP_flags',
         'DataType': 'flag8 / flag8',
         'Description': 'Remote boiler parameter transfer-enable & read/write flags',
         'R/W': 'R -',
@@ -88,7 +88,7 @@ OT = {
         'lflags_enabled': [1, 1, 0, 0, 0, 0, 0, 0]
     },
     7: {
-        'DataObject': 'Cooling-control',
+        'DataObject': 'Cooling_control',
         'DataType': 'f8.8',
         'Description': 'Cooling control signal (%)',
         'R/W': '- W',
@@ -116,35 +116,35 @@ OT = {
         'SubClass': 'OT_u8u8'
     },
     11: {
-        'DataObject': ['TSP-index', 'TSP-value'],
+        'DataObject': ['TSP_index', 'TSP_value'],
         'DataType': 'u8 / u8',
         'Description': ['Index number', 'Value of referred-to transparent slave parameter'],
         'R/W': 'R W',
         'SubClass': 'OT_u8u8_dual'
     },
     12: {
-        'DataObject': 'FHB-size',
+        'DataObject': 'FHB_size',
         'DataType': 'u8 / u8',
         'Description': 'Size of Fault-History-Buffer supported by slave',
         'R/W': 'R -',
         'SubClass': 'OT_u8u8'
     },
     13: {
-        'DataObject': ['FHB-index', 'FHB-value'],
+        'DataObject': ['FHB_index', 'FHB_value'],
         'DataType': 'u8 / u8',
         'Description': ['Index number', 'Value of referred-to fault-history buffer entry.'],
         'R/W': 'R -',
         'SubClass': 'OT_u8u8_dual'
     },
     14: {
-        'DataObject': 'Max-rel-mod-level-setting',
+        'DataObject': 'Max_rel_mod_level_setting',
         'DataType': 'f8.8',
         'Description': 'Maximum relative modulation level setting (%)',
         'R/W': '- W',
         'SubClass': 'OT_f88_p'
     },
     15: {
-        'DataObject': ['Max-Capacity', 'Min-Mod-Level'],
+        'DataObject': ['Max_Capacity', 'Min_Mod_Level'],
         'DataType': 'u8 / u8',
         'Description': ['Maximum boiler capacity (kW)', 'Minimum boiler modulation level (%)'],
         'R/W': 'R -',
@@ -158,28 +158,28 @@ OT = {
         'SubClass': 'OT_f88_C'
     },
     17: {
-        'DataObject': 'Rel.-mod-level',
+        'DataObject': 'Rel_mod_level',
         'DataType': 'f8.8',
         'Description': 'Relative Modulation Level (%)',
         'R/W': 'R -',
         'SubClass': 'OT_f88_p'
     },
     18: {
-        'DataObject': 'CH-pressure',
+        'DataObject': 'CH_pressure',
         'DataType': 'f8.8',
         'Description': 'Water pressure in CH circuit (bar)',
         'R/W': 'R -',
         'SubClass': 'OT_reg_18'
     },
     19: {
-        'DataObject': 'DHW-flow-rate',
+        'DataObject': 'DHW_flow_rate',
         'DataType': 'f8.8',
         'Description': 'Water flow rate in DHW circuit (litres/minute)',
         'R/W': 'R -',
         'SubClass': 'OT_reg_19'
     },
     20: {
-        'DataObject': 'Day-Time',
+        'DataObject': 'Day_Time',
         'DataType': 'u3 / u5 / u8',
         'Description': 'Day of Week and Time of Day',
         'R/W': 'R W',
@@ -277,7 +277,7 @@ OT = {
         'SubClass': 'OT_reg_33'
     },
     48: {
-        'DataObject': ['TdhwSet-UB', 'TdhwSet-LB'],
+        'DataObject': ['TdhwSet_UB', 'TdhwSet_LB'],
         'DataType': 's8 / s8',
         'Description': ['DHW setpoint upper bound for adjustment  (°C)',
                         'DHW setpoint lower bound for adjustment  (°C)'],
@@ -285,7 +285,7 @@ OT = {
         'SubClass': 'OT_s8s8_dual_C'
     },
     49: {
-        'DataObject': ['MaxTSet-UB', 'MaxTSet-LB'],
+        'DataObject': ['MaxTSet_UB', 'MaxTSet_LB'],
         'DataType': 's8 / s8',
         'Description': ['Max CH water setpoint upper bound for adjustment  (°C)',
                         'Max CH water setpoint lower bound for adjustment  (°C)'],
@@ -293,7 +293,7 @@ OT = {
         'SubClass': 'OT_s8s8_dual_C'
     },
     50: {
-        'DataObject': ['Hcratio-UB', 'Hcratio-LB'],
+        'DataObject': ['Hcratio_UB', 'Hcratio_LB'],
         'DataType': 's8 / s8',
         'Description': ['OTC heat curve ratio upper bound for adjustment',
                         'OTC heat curve ratio lower bound for adjustment'],
@@ -415,14 +415,14 @@ OT = {
         'SubClass': 'OT_f88'
     },
     126: {
-        'DataObject': 'Master-version',
+        'DataObject': 'Master_version',
         'DataType': 'u8 / u8',
         'Description': 'Master product version number and type',
         'R/W': '- W',
         'SubClass': 'OT_u8u8'
     },
     127: {
-        'DataObject': 'Slave-version',
+        'DataObject': 'Slave_version',
         'DataType': 'u8 / u8',
         'Description': 'Slave product version number and type',
         'R/W': 'R -',

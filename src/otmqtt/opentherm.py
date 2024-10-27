@@ -428,6 +428,7 @@ class OT_u8u8_dual(OpenThermApplProtocol):
                     self.dis_payload["device_class"])):
             t = {"DataObject": do}
             p = {"name": ds}
+            # print(f"u8u8_dual {ds}, i: {i}, unit: {unit}, devc: {devc}")
             p["unit_of_measurement"] = unit
             p["device_class"] = devc
             p["value_template"] = "{{ " + f"value_json.{do}" + " }}"
