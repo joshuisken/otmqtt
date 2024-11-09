@@ -415,18 +415,18 @@ OT = {
         'SubClass': 'OT_f88'
     },
     126: {
-        'DataObject': 'Master_version',
+        'DataObject': ['Master_version', 'Master_type'],
         'DataType': 'u8 / u8',
         'Description': 'Master product version number and type',
         'R/W': '- W',
-        'SubClass': 'OT_u8u8'
+        'SubClass': 'OT_u8u8_dual'
     },
     127: {
-        'DataObject': 'Slave_version',
+        'DataObject': ['Slave_version', 'Slave_type'],
         'DataType': 'u8 / u8',
         'Description': 'Slave product version number and type',
         'R/W': 'R -',
-        'SubClass': 'OT_u8u8'
+        'SubClass': 'OT_u8u8_dual'
     },
 
     # Folowing registers are used (by Honeywell T6) but are not specified

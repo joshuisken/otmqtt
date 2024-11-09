@@ -388,6 +388,9 @@ class OT_reg_100(OpenThermApplProtocol):
     pass
 
 class OT_u8u8(OpenThermApplProtocol):
+    """Fix me:
+    Two values in payload, hass expects one.
+    """
 
     def decode_payload(self):
         r = self.b_data_id
@@ -428,10 +431,10 @@ class OT_u8u8_dual(OpenThermApplProtocol):
                     self.dis_payload["device_class"])):
             t = {"DataObject": do}
             p = {"name": ds}
-            # print(f"u8u8_dual {ds}, i: {i}, unit: {unit}, devc: {devc}")
             p["unit_of_measurement"] = unit
             p["device_class"] = devc
             p["value_template"] = "{{ " + f"value_json.{do}" + " }}"
+            # print(f"u8u8_dual {i} do: {do}, ms: {ms}\n{json.dumps(p, indent=2)}")
             await super().mqtt_discovery(client, ms, p, t)
         return
 
@@ -462,7 +465,7 @@ class OT_s8s8_dual(OT_u8u8_dual):
 
 class OT_s8s8_dual_C(OT_s8s8_dual):
     dis_payload = {
-        "unit_of_measurement": ["°C","°C"],
+        "unit_of_measurement": ["°C", "°C"],
         "device_class": ["temperature", "temperature"]
     }
 
