@@ -287,7 +287,8 @@ OT = {
         'SubClass': 'OT_reg_33',
         "unit_of_measurement": "°C",
         "device_class": "temperature",
-        "decode_payload": lambda v: (v - 0x10000) if v & 0x8000 else v
+        # FIXME: Lambda function breaks json dump.
+        # "decode_payload": lambda v: (v - 0x10000) if v & 0x8000 else v
     },
     48: {
         'DataObject': ['TdhwSet_UB', 'TdhwSet_LB'],
