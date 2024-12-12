@@ -38,7 +38,8 @@ OT = {
     2: {
         'DataObject': ['M_Config', 'M_MemberIDcode'],
         'DataType': 'flag8 / u8',
-        'Description': ['Master Configuration Flags', 'Master MemberID Code'],
+        'Description': ['Master Configuration Flags',
+                        'Master MemberID Code'],
         'R/W': '- W',
         'SubClass': 'OT_f8u8',
         'hflags': ['reserved'] * 8,
@@ -48,7 +49,8 @@ OT = {
     3: {
         'DataObject': ['S_Config', 'S_MemberIDcode'],
         'DataType': 'flag8 / u8',
-        'Description': ['Slave Configuration Flags', 'Slave MemberID Code'],
+        'Description': ['Slave Configuration Flags',
+                        'Slave MemberID Code'],
         'R/W': 'R -',
         'SubClass': 'OT_f8u8',
         'hflags': ['DHW_present', 'Control_type', 'Cooling_config', 'DHW_config',
@@ -57,16 +59,18 @@ OT = {
         'hflags_enabled': [1, 1, 1, 1, 1, 1, 0, 0]
     },
     4: {
-        'DataObject': 'Command',
+        'DataObject': ['Command_H', 'Command_L'],
         'DataType': 'u8 / u8',
-        'Description': 'Remote Command',
+        'Description': ['Remote Command High',
+                        'Remote Command Low'],
         'R/W': '- W',
-        'SubClass': 'OT_u8u8'
+        'SubClass': 'OT_u8u8_dual'
     },
     5: {
         'DataObject': ['ASF_flags', 'OEM_fault_code'],
         'DataType': 'flag8 / u8',
-        'Description': ['Application-specific fault flags', 'OEM fault code'],
+        'Description': ['Application-specific fault flags',
+                        'OEM fault code'],
         'R/W': 'R -',
         'SubClass': 'OT_f8u8',
         'hflags': ['Service_request', 'Lockout_request', 'Low_water_press', 'Gas_flame_fault',
@@ -109,30 +113,34 @@ OT = {
         'SubClass': 'OT_f88_C'
     },
     10: {
-        'DataObject': 'TSP',
+        'DataObject': ['TSP_H', 'TSP_L'],
         'DataType': 'u8 / u8',
-        'Description': 'Number of Transparent-Slave-Parameters supported by slave',
+        'Description': ['HNumber of Transparent-Slave-Parameters supported by slave',
+                        'LNumber of Transparent-Slave-Parameters supported by slave'],
         'R/W': 'R -',
-        'SubClass': 'OT_u8u8'
+        'SubClass': 'OT_u8u8_dual'
     },
     11: {
         'DataObject': ['TSP_index', 'TSP_value'],
         'DataType': 'u8 / u8',
-        'Description': ['Index number', 'Value of referred-to transparent slave parameter'],
+        'Description': ['Index number',
+                        'Value of referred-to transparent slave parameter'],
         'R/W': 'R W',
         'SubClass': 'OT_u8u8_dual'
     },
     12: {
-        'DataObject': 'FHB_size',
+        'DataObject': ['FHB_size_H', 'FHB_size_L'],
         'DataType': 'u8 / u8',
-        'Description': 'Size of Fault-History-Buffer supported by slave',
+        'Description': ['HSize of Fault-History-Buffer supported by slave',
+                        'LSize of Fault-History-Buffer supported by slave'],
         'R/W': 'R -',
-        'SubClass': 'OT_u8u8'
+        'SubClass': 'OT_u8u8_dual'
     },
     13: {
         'DataObject': ['FHB_index', 'FHB_value'],
         'DataType': 'u8 / u8',
-        'Description': ['Index number', 'Value of referred-to fault-history buffer entry.'],
+        'Description': ['Index number',
+                        'Value of referred-to fault-history buffer entry.'],
         'R/W': 'R -',
         'SubClass': 'OT_u8u8_dual'
     },
@@ -146,7 +154,8 @@ OT = {
     15: {
         'DataObject': ['Max_Capacity', 'Min_Mod_Level'],
         'DataType': 'u8 / u8',
-        'Description': ['Maximum boiler capacity (kW)', 'Minimum boiler modulation level (%)'],
+        'Description': ['Maximum boiler capacity (kW)',
+                        'Minimum boiler modulation level (%)'],
         'R/W': 'R -',
         'SubClass': 'OT_reg_15'
     },
@@ -186,11 +195,12 @@ OT = {
         'SubClass': 'OT_reg_20'
     },
     21: {
-        'DataObject': 'Date',
+        'DataObject': ['Month', 'Day_of_Month'],
         'DataType': 'u8 / u8',
-        'Description': 'Calendar date',
+        'Description': ['Calendar month',
+                        'Calendar day of month'],
         'R/W': 'R W',
-        'SubClass': 'OT_u8u8'
+        'SubClass': 'OT_u8u8_dual'
     },
     22: {
         'DataObject': 'Year',
@@ -274,7 +284,10 @@ OT = {
         'DataType': 's16',
         'Description': 'Boiler exhaust temperature (°C)',
         'R/W': 'R -',
-        'SubClass': 'OT_reg_33'
+        'SubClass': 'OT_reg_33',
+        "unit_of_measurement": "°C",
+        "device_class": "temperature",
+        "decode_payload": lambda v: (v - 0x10000) if v & 0x8000 else v
     },
     48: {
         'DataObject': ['TdhwSet_UB', 'TdhwSet_LB'],
@@ -417,14 +430,16 @@ OT = {
     126: {
         'DataObject': ['Master_version', 'Master_type'],
         'DataType': 'u8 / u8',
-        'Description': 'Master product version number and type',
+        'Description': ['Master product version number',
+                        'Master product version type'],
         'R/W': '- W',
         'SubClass': 'OT_u8u8_dual'
     },
     127: {
         'DataObject': ['Slave_version', 'Slave_type'],
         'DataType': 'u8 / u8',
-        'Description': 'Slave product version number and type',
+        'Description': ['Slave product version number',
+                        'Slave product version type'],
         'R/W': 'R -',
         'SubClass': 'OT_u8u8_dual'
     },

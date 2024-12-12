@@ -37,8 +37,10 @@ telegram = None  # Telegram bot
 
 online = False
 
+# Message Cache
 msgs_master = {}
 msgs_slave = {}
+
 t_esp = None
 
 logger = None
@@ -84,21 +86,24 @@ def desc_sent(frame):
         return True
     return False
 
+async def process_ms(client, message, cache, ms, ms_desc):
+    """Process OT master/slave frame.
 
-async def process_slave(client, message):
-    global args, config, msgs_slave, logger
+    If not yet sent:
+    - sent a home-assistant auto-discovery msg
+    - sent a description message
+    For each OT-register:
+    - only sent MQTT msg if value has changed
+    """ 
+    global config, logger
     th = config["MQTT"]["topic"]
+    # Construct OT frame with factory function
     frame = OpenThermApplProtocol.from_frame(
         int(message.payload.decode("utf-8"), 16))
-    reg = frame.data_id()
-    if not reg in msgs_slave:
+    if not frame.data_id() in cache:
         # Send homeassistant discovery message(s)
-        await frame.mqtt_discovery(client, "s")
-    if updated(frame, msgs_slave):
-        # Only publish updated values
-        t, p = frame.mqtt_msg("s")
-        await client.publish(f"{th}/{t}", payload=p)
-        logger.debug(f"Slave  updated transfer: {hex(frame.frame)} -> t={th}/{t} p={p}")
+        await frame.mqtt_discovery(client, ms)
+        logger.info(f"Discovery msg for {ms}_{frame.data_id()}")
     if not desc_sent(frame):
         # Send description, dataobject, and R/W info from spec
         t, p = frame.mqtt_desc()
@@ -107,31 +112,23 @@ async def process_slave(client, message):
         await client.publish(f"{th}/{t}", payload=p, retain=True)
         t, p = frame.mqtt_rw()
         await client.publish(f"{th}/{t}", payload=p, retain=True)
+    if updated(frame, cache):  # Side-effect: stored in cache
+        # Only publish updated values
+        t, p = frame.mqtt_msg(ms)
+        await client.publish(f"{th}/{t}", payload=p)
+        logger.debug(f"{ms_desc} updated transfer: {hex(frame.frame)} -> t={th}/{t} p={p}")
+    return
+
+
+async def process_slave(client, message):
+    global msgs_slave
+    await process_ms(client, message, msgs_slave, "s", "Slave ")
     return
 
 
 async def process_master(client, message):
-    global args, config, msgs_master, logger
-    th = config["MQTT"]["topic"]
-    frame = OpenThermApplProtocol.from_frame(
-        int(message.payload.decode("utf-8"), 16))
-    reg = frame.data_id()
-    if not reg in msgs_master:
-        # Send homeassistant discovery message(s)
-        await frame.mqtt_discovery(client, "m")
-    if updated(frame, msgs_master):
-        # Only publish updated values
-        t, p = frame.mqtt_msg("m")
-        await client.publish(f"{th}/{t}", payload=p)
-        logger.debug(f"Master  updated transfer: {hex(frame.frame)} -> t={th}/{t} p={p}")
-    if not desc_sent(frame):
-        # Send description, dataobject, and R/W info from spec
-        t, p = frame.mqtt_desc()
-        await client.publish(f"{th}/{t}", payload=p, retain=True)
-        t, p = frame.mqtt_dataobject()
-        await client.publish(f"{th}/{t}", payload=p, retain=True)
-        t, p = frame.mqtt_rw()
-        await client.publish(f"{th}/{t}", payload=p, retain=True)
+    global msgs_master
+    await process_ms(client, message, msgs_master, "m", "Master")
     return
 
 
@@ -161,9 +158,8 @@ async def process_timeout(client, message):
 
 
 async def process_dump_state(client, message):
-    global logger
+    global logger, msgs_slave, msgs_master
     m = message.payload.decode('utf-8')
-    global msgs_slave, msgs_master
     with open("ot_master.json", "w") as f:
         f.write(json.dumps(dict(sorted(msgs_master.items())), indent=2))
     with open("ot_slave.json", "w") as f:
@@ -176,20 +172,37 @@ async def process_dump_state(client, message):
     return
 
 
-async def process_discovery(client, message):
+async def clear_cache(client):
+    """ Trigger:
+    (Re-)Send all discovery messages for all available OpenTherm registers.
+    By clearing the cache in ot_mqtt_esp.
+    """
     global logger, msgs_master, msgs_slave
-    m = message.payload.decode('utf-8')
-    logger.info(f"Homeassistant autodiscovery {m}")
-    if m != "online":
-        return
-    # (Re-)Send all discovery messages for all available OpenTherm registers
-    # Clearing the cache in otmqtt
     msgs_master = {}
     msgs_slave = {}
     # AND clear the cache in ot_mqtt_esp
     global t_esp
     t, p = f"{t_esp}/cmd", "clear"
     await client.publish(t, payload=p)
+    return
+
+
+async def process_discovery(client, message):
+    global logger, msgs_master, msgs_slave
+    m = message.payload.decode('utf-8')
+    logger.info(f"Homeassistant autodiscovery {m}")
+    if m != "online":
+        return
+    await clear_cache(client)
+    return
+
+
+async def process_command(client, message):
+    global logger
+    m = message.payload.decode('utf-8')
+    if m == "clear":
+        await clear_cache(client)
+    logger.debug(f"Cleared otmqtt cache and (Re)Send all discovery messages.")
     return
 
 
@@ -266,6 +279,7 @@ async def mqtt_client(config):
     tasks = {
         # Dump the last state of all master/slave messages
         f"{t_ot}/dump": process_dump_state,
+        f"{t_ot}/cmd": process_command,
         # OpenTherm gateway
         f"{t_esp}/state": process_state,
         f"{t_esp}/master": process_master,

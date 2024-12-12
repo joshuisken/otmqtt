@@ -113,9 +113,9 @@ class OpenThermApplProtocol(OpenThermProtocol):
             if subcl in globals():
                 # Return a specialized SubClass, depending on reg_id
                 return globals()[subcl](frame)
-            print(f"Missing {subcl} in code, or wrong in ot_registers.py")
+            logger.warning(f"Missing {subcl} in code, or wrong in ot_registers.py")
         # Insert this new register in OT, yet unknown and ignore further
-        print(f"Missing Register 'data_id'=={reg_id} in OT")
+        logger.warning(f"Missing Register 'data_id'=={reg_id} in OT")
         OT[reg_id] = {}
         OT[reg_id]["Description"] = "Unkown register"
         OT[reg_id]["R/W"] = "- -"  # Do not use
@@ -145,6 +145,8 @@ class OpenThermApplProtocol(OpenThermProtocol):
         """Construct topic and payload for description of register."""
         t = str(self.b_data_id) + "/desc"
         p = self.OT[self.b_data_id]["Description"]
+        if type(p) == list:
+            p = json.dumps(p)
         return t, p
 
     def mqtt_rw(self):
@@ -157,6 +159,8 @@ class OpenThermApplProtocol(OpenThermProtocol):
         """Construct topic and payload for DataObject of register."""
         t = str(self.b_data_id) + "/d_obj"
         p = self.OT[self.b_data_id]["DataObject"]
+        if type(p) == list:
+            p = json.dumps(p)
         return t, p
 
     def discovery_topic(self, ms, component="sensor", node_id="OpenThermGW", topic_ext="", topic={}):
@@ -269,8 +273,6 @@ class OT_f8f8(OpenThermApplProtocol):
             await self.mqtt_discovery_flag(client, ms, select, flag, devclass, topic=t)
         return
 
-    pass
-
 
 # class OT_reg_0(OT_f8f8):
 #     """Master and Slave Status flags."""
@@ -357,8 +359,6 @@ class OT_f8u8(OpenThermApplProtocol):
         await super().mqtt_discovery(client, ms, payload=p, topic=t)
         return
 
-    pass
-
 
 class OT_reg_100(OpenThermApplProtocol):
 
@@ -385,35 +385,11 @@ class OT_reg_100(OpenThermApplProtocol):
             await self.mqtt_discovery_flag(client, ms, select, flag, devclass, topic=t)
         return
 
-    pass
-
-class OT_u8u8(OpenThermApplProtocol):
-    """Fix me:
-    Two values in payload, hass expects one.
-    """
-
-    def decode_payload(self):
-        r = self.b_data_id
-        dv = self.b_data_value
-        v = {self.OT[r]["DataObject"]: [(dv >> 8) & 0xff, dv & 0xff]}
-        return json.dumps(v)
-
-    async def mqtt_discovery(self, client, ms):
-        r = self.b_data_id
-        dobj = self.OT[self.b_data_id]["DataObject"]
-        t = {"DataObject": dobj}
-        p = {"name": self.OT[self.b_data_id]["Description"]}
-        p["value_template"] = "{{ " + f"value_json.{dobj}" + " }}"
-        await super().mqtt_discovery(client, ms, p, t)
-        return
-
-    pass
-
 
 class OT_u8u8_dual(OpenThermApplProtocol):
     dis_payload = {
-        "unit_of_measurement": [None, None],
-        "device_class": [None, None]
+        "unit_of_measurement": ["", ""],
+        "device_class": ["enum", "enum"]
     }
 
     def decode_payload(self):
@@ -424,18 +400,21 @@ class OT_u8u8_dual(OpenThermApplProtocol):
         return json.dumps(v)
 
     async def mqtt_discovery(self, client, ms):
-        for i, (do, ds, unit, devc) in enumerate(
-                zip(self.OT[self.b_data_id]["DataObject"],
-                    self.OT[self.b_data_id]["Description"],
-                    self.dis_payload["unit_of_measurement"],
-                    self.dis_payload["device_class"])):
-            t = {"DataObject": do}
-            p = {"name": ds}
-            p["unit_of_measurement"] = unit
-            p["device_class"] = devc
-            p["value_template"] = "{{ " + f"value_json.{do}" + " }}"
-            # print(f"u8u8_dual {i} do: {do}, ms: {ms}\n{json.dumps(p, indent=2)}")
-            await super().mqtt_discovery(client, ms, p, t)
+        try:
+            for i, (do, ds, unit, devc) in enumerate(
+                    zip(self.OT[self.b_data_id]["DataObject"],
+                        self.OT[self.b_data_id]["Description"],
+                        self.dis_payload["unit_of_measurement"],
+                        self.dis_payload["device_class"])):
+                t = {"DataObject": do}
+                p = {"name": ds}
+                p["unit_of_measurement"] = unit
+                p["device_class"] = devc
+                p["value_template"] = "{{ " + f"value_json.{do}" + " }}"
+                logger.debug(f"u8u8_dual {i} do: {do}, ms: {ms}\n{json.dumps(p, indent=2)}")
+                await super().mqtt_discovery(client, ms, p, t)
+        except TypeError as e:
+            logger.error(f"{e}\nFailure with register {self.b_data_id}")
         return
 
 class OT_reg_15(OT_u8u8_dual):
@@ -443,8 +422,6 @@ class OT_reg_15(OT_u8u8_dual):
         "unit_of_measurement": ["kW", "%"],
         "device_class": ["power", "power_factor"]
     }
-
-    pass
 
 
 class OT_s8s8_dual(OT_u8u8_dual):
@@ -460,16 +437,12 @@ class OT_s8s8_dual(OT_u8u8_dual):
              self.OT[r]["DataObject"][1]: sbyte(dv & 0xff)}
         return json.dumps(v)
 
-    pass
-
 
 class OT_s8s8_dual_C(OT_s8s8_dual):
     dis_payload = {
         "unit_of_measurement": ["°C", "°C"],
         "device_class": ["temperature", "temperature"]
     }
-
-    pass
     
 
 class OT_reg_20(OpenThermApplProtocol):
@@ -483,8 +456,6 @@ class OT_reg_20(OpenThermApplProtocol):
         # await super().mqtt_discovery(client, ms)
         return
 
-    pass
-
 
 class OT_f88(OpenThermApplProtocol):
 
@@ -493,8 +464,6 @@ class OT_f88(OpenThermApplProtocol):
         t = (v - 0x10000) / 256.0 if v & 0x8000 else v / 256.0
         return f"{t:.2f}"
 
-    pass
-
 
 class OT_f88_C(OT_f88):
     dis_payload = {
@@ -502,15 +471,11 @@ class OT_f88_C(OT_f88):
         "device_class": "temperature"
     }
 
-    pass
-
 
 class OT_f88_p(OT_f88):
     dis_payload = {
         "unit_of_measurement": "%"
     }
-
-    pass
 
 
 class OT_reg_18(OT_f88):
@@ -519,16 +484,12 @@ class OT_reg_18(OT_f88):
         "device_class": "pressure"
     }
 
-    pass
-
 
 class OT_reg_19(OT_f88):
     dis_payload = {
         "unit_of_measurement": "L/min",
         "device_class": "volume_flow_rate"
     }
-
-    pass
 
 
 class OT_u16(OpenThermApplProtocol):
@@ -545,6 +506,4 @@ class OT_reg_33(OpenThermApplProtocol):
     def decode_payload(self):
         v = self.b_data_value
         return (v - 0x10000) if v & 0x8000 else v
-
-    pass
 
