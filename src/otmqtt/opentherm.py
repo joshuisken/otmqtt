@@ -411,7 +411,7 @@ class OT_u8u8_dual(OpenThermApplProtocol):
                 p["unit_of_measurement"] = unit
                 p["device_class"] = devc
                 p["value_template"] = "{{ " + f"value_json.{do}" + " }}"
-                logger.debug(f"u8u8_dual {i} do: {do}, ms: {ms}\n{json.dumps(p, indent=2)}")
+                logger.debug(f"{self.__class__.__name__} {i} do: {do}, ms: {ms}\n{json.dumps(p, indent=2)}")
                 await super().mqtt_discovery(client, ms, p, t)
         except TypeError as e:
             logger.error(f"{e}\nFailure with register {self.b_data_id}")
