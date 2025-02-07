@@ -305,7 +305,8 @@ async def mqtt_client(config):
                 logger=logger,
                 will=will) as client:
             logger.info("Connected mqtt")
-            await client.publish(f"{t_ot}/state", payload=f"online, trial {maxtrials - trials + 1}", retain=True)
+            await client.publish(f"{t_ot}/state", payload=f"online", retain=True)
+            await client.publish(f"{t_ot}/trial", payload=f"{maxtrials - trials + 1}")
             # Clear the transfer cache in the OpenTherm gateway monitor
             await client.publish(f"{t_esp}/cmd", payload="clear")
             for k in tasks.keys():

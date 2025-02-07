@@ -15,11 +15,11 @@ TPL = {
     "state_class": "measurement",
     "availability": [ {
         "topic": "esp/mqtt_ot/state",
-        "payload_available": "online, version 0.5",
+        "payload_available": "online",
         "payload_not_available": "offline"
     }, {
         "topic": "otgw/state",
-        "payload_available": "online, trial 1",
+        "payload_available": "online",
         "payload_not_available": "offline"
     } ],
     "device": {
