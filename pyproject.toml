@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "otmqtt"
-version = "0.5.1"
+version = "0.5.2"
 authors = [
   { name="Jos Huisken", email="jos.huisken@gmail.com" },
 ]

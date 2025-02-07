@@ -17,6 +17,7 @@ NOTES:  Given my setting with Lyric T6 and Intergas <type>
   [113, 114, 128, 200, 202, 204, 220]
 
 """
+import copy
 import json
 import logging
 import sys
@@ -186,7 +187,7 @@ class OpenThermApplProtocol(OpenThermProtocol):
     def discovery_payload(self, ms, uid_ext="", topic={}):
         reg_id = self.b_data_id
 
-        p = {} if not hasattr(self, "dis_payload") else self.dis_payload
+        p = {} if not hasattr(self, "dis_payload") else copy.deepcopy(self.dis_payload)
 
         p["name"] = self.OT[reg_id]["Description"]
         p["state_topic"] = f"otgw/{reg_id}/{ms}_{self.shrt_msg_types[self.b_msg_type]}"
@@ -411,7 +412,6 @@ class OT_u8u8_dual(OpenThermApplProtocol):
                 p["unit_of_measurement"] = unit
                 p["device_class"] = devc
                 p["value_template"] = "{{ " + f"value_json.{do}" + " }}"
-                logger.debug(f"{self.__class__.__name__} {i} do: {do}, ms: {ms}\n{json.dumps(p, indent=2)}")
                 await super().mqtt_discovery(client, ms, p, t)
         except TypeError as e:
             logger.error(f"{e}\nFailure with register {self.b_data_id}")
